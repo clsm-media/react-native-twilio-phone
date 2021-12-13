@@ -119,6 +119,7 @@ class TwilioPhone: RCTEventEmitter {
             callInvite.reject()
             activeCallInvites.removeValue(forKey: callSid)
         } else if let call = activeCalls[callSid] {
+             NSLog("[TwilioPhone]Disconect call: \(call)")
             call.disconnect()
         } else {
             NSLog("[TwilioPhone] Unknown sid to perform end-call action with")
