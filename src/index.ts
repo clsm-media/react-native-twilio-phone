@@ -34,6 +34,7 @@ type TwilioPhoneType = {
   activateAudio(): void; // iOS only
   deactivateAudio(): void; // iOS only
   checkPermissions(callback: (permissions: Permissions) => void): void;
+  requestPermissionIOS(callback: (status: PermissionStatus) => void): void;
 };
 
 const TwilioPhone = NativeModules.TwilioPhone as TwilioPhoneType;

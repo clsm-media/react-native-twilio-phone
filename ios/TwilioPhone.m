@@ -33,4 +33,6 @@ RCT_EXTERN_METHOD(deactivateAudio)
 
 RCT_EXTERN_METHOD(checkPermissions:(RCTResponseSenderBlock)callback)
 
+RCT_EXTERN_METHOD(requestPermissionIOS:(RCTResponseSenderBlock)callback)
+
 @end
