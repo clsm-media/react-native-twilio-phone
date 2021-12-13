@@ -11,8 +11,8 @@ import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 import com.twilio.voice.*
 
-class TwilioPhoneModule(reactContext: ReactApplicationContext) :
-  ReactContextBaseJavaModule(reactContext) {
+
+class TwilioPhoneModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
   private val tag = "TwilioPhone"
 
@@ -21,8 +21,7 @@ class TwilioPhoneModule(reactContext: ReactApplicationContext) :
 
   private var callListener = callListener()
 
-  private var audioManager: AudioManager =
-    reactContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+  private var audioManager: AudioManager = reactContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
   override fun getName(): String {
     return "TwilioPhone"
@@ -32,27 +31,23 @@ class TwilioPhoneModule(reactContext: ReactApplicationContext) :
   fun register(accessToken: String, deviceToken: String) {
     Log.i(tag, "Registering")
 
-    Voice.register(
-      accessToken,
-      Voice.RegistrationChannel.FCM,
-      deviceToken,
-      object : RegistrationListener {
-        override fun onRegistered(accessToken: String, fcmToken: String) {
-          Log.d(tag, "Successfully registered FCM token")
+    Voice.register(accessToken, Voice.RegistrationChannel.FCM, deviceToken, object : RegistrationListener {
+      override fun onRegistered(accessToken: String, fcmToken: String) {
+        Log.d(tag, "Successfully registered FCM token")
 
-          sendEvent(reactApplicationContext, "RegistrationSuccess", null)
-        }
+        sendEvent(reactApplicationContext, "RegistrationSuccess", null)
+      }
 
-        override fun onError(error: RegistrationException, accessToken: String, fcmToken: String) {
-          Log.e(tag, "Registration error: ${error.errorCode}, ${error.message}")
+      override fun onError(error: RegistrationException, accessToken: String, fcmToken: String) {
+        Log.e(tag, "Registration error: ${error.errorCode}, ${error.message}")
 
-          val params = Arguments.createMap()
-          params.putInt("errorCode", error.errorCode)
-          params.putString("errorMessage", error.message)
+        val params = Arguments.createMap()
+        params.putInt("errorCode", error.errorCode)
+        params.putString("errorMessage", error.message)
 
-          sendEvent(reactApplicationContext, "RegistrationFailure", params)
-        }
-      })
+        sendEvent(reactApplicationContext, "RegistrationFailure", params)
+      }
+    })
   }
 
   @ReactMethod
@@ -80,10 +75,7 @@ class TwilioPhoneModule(reactContext: ReactApplicationContext) :
         sendEvent(reactApplicationContext, "CallInvite", params)
       }
 
-      override fun onCancelledCallInvite(
-        cancelledCallInvite: CancelledCallInvite,
-        callException: CallException?
-      ) {
+      override fun onCancelledCallInvite(cancelledCallInvite: CancelledCallInvite, callException: CallException?) {
         Log.d(tag, "Cancelled call invite received")
 
         activeCallInvites.remove(cancelledCallInvite.callSid)
@@ -132,7 +124,7 @@ class TwilioPhoneModule(reactContext: ReactApplicationContext) :
   @ReactMethod
   fun disconnectCall(callSid: String) {
     Log.i(tag, "Disconnecting call")
-
+    Log.i(tag, callSid)
     if (activeCalls[callSid] == null) {
       Log.e(tag, "No call to be disconnected")
       return
@@ -213,27 +205,23 @@ class TwilioPhoneModule(reactContext: ReactApplicationContext) :
   fun unregister(accessToken: String, deviceToken: String) {
     Log.i(tag, "Unregistering")
 
-    Voice.unregister(
-      accessToken,
-      Voice.RegistrationChannel.FCM,
-      deviceToken,
-      object : UnregistrationListener {
-        override fun onUnregistered(accessToken: String, fcmToken: String) {
-          Log.d(tag, "Successfully unregistered FCM token")
+    Voice.unregister(accessToken, Voice.RegistrationChannel.FCM, deviceToken, object : UnregistrationListener {
+      override fun onUnregistered(accessToken: String, fcmToken: String) {
+        Log.d(tag, "Successfully unregistered FCM token")
 
-          sendEvent(reactApplicationContext, "UnregistrationSuccess", null)
-        }
+        sendEvent(reactApplicationContext, "UnregistrationSuccess", null)
+      }
 
-        override fun onError(error: RegistrationException, accessToken: String, fcmToken: String) {
-          Log.e(tag, "Unregistration error: ${error.errorCode}, ${error.message}")
+      override fun onError(error: RegistrationException, accessToken: String, fcmToken: String) {
+        Log.e(tag, "Unregistration error: ${error.errorCode}, ${error.message}")
 
-          val params = Arguments.createMap()
-          params.putInt("errorCode", error.errorCode)
-          params.putString("errorMessage", error.message)
+        val params = Arguments.createMap()
+        params.putInt("errorCode", error.errorCode)
+        params.putString("errorMessage", error.message)
 
-          sendEvent(reactApplicationContext, "UnregistrationFailure", params)
-        }
-      })
+        sendEvent(reactApplicationContext, "UnregistrationFailure", params)
+      }
+    })
   }
 
   @ReactMethod
@@ -247,33 +235,25 @@ class TwilioPhoneModule(reactContext: ReactApplicationContext) :
       permissionsToRequest.add(android.Manifest.permission.RECORD_AUDIO)
     }
 
-    val callPhone = checkPermission(android.Manifest.permission.CALL_PHONE)
-    if (callPhone != "GRANTED") {
-      permissionsToRequest.add(android.Manifest.permission.CALL_PHONE)
-    }
+//    val callPhone = checkPermission(android.Manifest.permission.CALL_PHONE)
+//    if (callPhone != "GRANTED") {
+//      permissionsToRequest.add(android.Manifest.permission.CALL_PHONE)
+//    }
 
-    if (permissionsToRequest.isNotEmpty()) {
-      currentActivity?.let {
-        ActivityCompat.requestPermissions(
-          it,
-          permissionsToRequest.toTypedArray(),
-          1
-        )
-      }
-    }
+//    if (permissionsToRequest.isNotEmpty()) {
+//      currentActivity?.let { ActivityCompat.requestPermissions(it, permissionsToRequest.toTypedArray(), 1) }
+//    }
 
     val permissions = Arguments.createMap()
     permissions.putString("RECORD_AUDIO", recordAudio)
-    permissions.putString("CALL_PHONE", callPhone)
+//    permissions.putString("CALL_PHONE", callPhone)
 
     callback(permissions)
   }
 
-  private fun sendEvent(
-    reactContext: ReactContext,
-    eventName: String,
-    params: WritableMap?
-  ) {
+  private fun sendEvent(reactContext: ReactContext,
+                        eventName: String,
+                        params: WritableMap?) {
     reactContext
       .getJSModule(RCTDeviceEventEmitter::class.java)
       .emit(eventName, params)
@@ -328,6 +308,8 @@ class TwilioPhoneModule(reactContext: ReactApplicationContext) :
 
         val params = Arguments.createMap()
         params.putString("callSid", call.sid)
+
+        activeCalls.put(call.sid!!, call)
 
         sendEvent(reactApplicationContext, "CallConnected", params)
       }

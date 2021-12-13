@@ -234,7 +234,7 @@ class TwilioPhone: RCTEventEmitter {
         
         var permissions: [String: String] = [:]
         
-        let permissionStatus = AVAudioSession.sharedInstance().recordPermission
+        let permissionStatus = AVAudioSession.sharedInstance().recordPermission()
         
         switch permissionStatus {
         case .granted:
@@ -243,15 +243,28 @@ class TwilioPhone: RCTEventEmitter {
             permissions["RECORD"] = "DENIED"
         case .undetermined:
             permissions["RECORD"] = "UNDETERMINED"
-            
-            AVAudioSession.sharedInstance().requestRecordPermission { granted in
-                NSLog("[TwilioPhone] Record permission granted: \(granted)")
-            }
         default:
             permissions["RECORD"] = "UNKNOWN"
         }
         
         callback([permissions])
+    }
+
+    @objc(requestPermissionIOS:)
+        func requestPermissionIOS(callback: @escaping RCTResponseSenderBlock) {
+            NSLog("[TwilioPhone] Requesting permission")
+            
+            var status: [String: String] = [:]
+            
+            AVAudioSession.sharedInstance().requestRecordPermission { granted in
+                NSLog("[TwilioPhone] Record permission granted: \(granted)")
+                if (granted) {
+                    status["RECORD"] = "GRANTED"
+                } else {
+                    status["RECORD"] = "NOT GRANTED"
+                }
+                callback([status])
+            }
     }
     
     func hexToData(str: String) -> Data {
@@ -317,6 +330,8 @@ extension TwilioPhone: CallDelegate {
     func callDidConnect(call: Call) {
         NSLog("[TwilioPhone] Call did connect")
         
+        activeCalls[call.sid] = call
+        
         if hasListeners {
             sendEvent(withName: "CallConnected", body: ["callSid": call.sid])
         }
@@ -361,6 +376,7 @@ extension TwilioPhone: CallDelegate {
         
         activeCalls.removeValue(forKey: call.sid)
     }
+    
 }
 
 // MARK: - TVONotificationDelegate
@@ -395,4 +411,5 @@ extension TwilioPhone: NotificationDelegate {
             sendEvent(withName: "CancelledCallInvite", body: ["callSid": cancelledCallInvite.callSid])
         }
     }
+    
 }

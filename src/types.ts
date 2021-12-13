@@ -1,1 +1,1 @@
-declare module 'react-native-voip-push-notification';
+// declare module 'react-native-voip-push-notification';
