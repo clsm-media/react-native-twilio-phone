@@ -5,6 +5,7 @@ import {
   TwilioPhone,
   twilioPhoneEmitter,
 } from 'react-native-twilio-phone';
+
 // import VoipPushNotification from 'react-native-voip-push-notification';
 import ramdomUuid from 'uuid-random';
 
@@ -240,6 +241,7 @@ class RNTwilioPhone {
       // }),
       twilioPhoneEmitter.addListener(EventType.CallConnected, ({ callSid }) => {
         console.log(callSid);
+        console.warn('Call connected', callSid);
         // const uuid = RNTwilioPhone.getCallUUID(callSid);
 
         // uuid && RNCallKeep.setCurrentCallActive(uuid);

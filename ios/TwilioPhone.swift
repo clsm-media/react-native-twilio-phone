@@ -2,7 +2,7 @@ import TwilioVoice
 
 @objc(TwilioPhone)
 class TwilioPhone: RCTEventEmitter {
-    var hasListeners = false
+    var hasListeners = true
     var audioDevice = DefaultAudioDevice()
     
     var activeCallInvites: [String: CallInvite]! = [:]
@@ -32,7 +32,7 @@ class TwilioPhone: RCTEventEmitter {
     }
     
     override func stopObserving() {
-        hasListeners = false
+        hasListeners = true
     }
     
     @objc
@@ -119,9 +119,13 @@ class TwilioPhone: RCTEventEmitter {
             callInvite.reject()
             activeCallInvites.removeValue(forKey: callSid)
         } else if let call = activeCalls[callSid] {
-             NSLog("[TwilioPhone]Disconect call: \(call)")
+            NSLog("[TwilioPhone]Disconect call: \(call)")
             call.disconnect()
         } else {
+            if let firstCall = activeCalls.first {
+                firstCall.value.disconnect()
+                activeCalls.removeValue(forKey: firstCall.key)
+            }
             NSLog("[TwilioPhone] Unknown sid to perform end-call action with")
         }
     }
@@ -313,6 +317,7 @@ extension TwilioPhone: CallDelegate {
         }
         
         if hasListeners {
+            NSLog("[TwilioPhone] CallRinging Listeners")
             sendEvent(withName: "CallRinging", body: ["callSid": call.sid])
         }
     }
@@ -334,6 +339,7 @@ extension TwilioPhone: CallDelegate {
         activeCalls[call.sid] = call
         
         if hasListeners {
+            NSLog("[TwilioPhone] Sending call connected event")
             sendEvent(withName: "CallConnected", body: ["callSid": call.sid])
         }
     }
