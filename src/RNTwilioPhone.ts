@@ -241,7 +241,6 @@ class RNTwilioPhone {
       // }),
       twilioPhoneEmitter.addListener(EventType.CallConnected, ({ callSid }) => {
         console.log(callSid);
-        console.warn('Call connected', callSid);
         // const uuid = RNTwilioPhone.getCallUUID(callSid);
 
         // uuid && RNCallKeep.setCurrentCallActive(uuid);
