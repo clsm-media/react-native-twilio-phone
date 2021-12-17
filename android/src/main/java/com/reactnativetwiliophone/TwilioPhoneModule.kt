@@ -235,19 +235,27 @@ class TwilioPhoneModule(reactContext: ReactApplicationContext) : ReactContextBas
       permissionsToRequest.add(android.Manifest.permission.RECORD_AUDIO)
     }
 
-//    val callPhone = checkPermission(android.Manifest.permission.CALL_PHONE)
-//    if (callPhone != "GRANTED") {
-//      permissionsToRequest.add(android.Manifest.permission.CALL_PHONE)
-//    }
-
-//    if (permissionsToRequest.isNotEmpty()) {
-//      currentActivity?.let { ActivityCompat.requestPermissions(it, permissionsToRequest.toTypedArray(), 1) }
-//    }
-
     val permissions = Arguments.createMap()
     permissions.putString("RECORD_AUDIO", recordAudio)
-//    permissions.putString("CALL_PHONE", callPhone)
 
+    callback(permissions)
+  }
+
+  @ReactMethod
+  fun requestPermission(callback: Callback) {
+    
+    Log.i(tag, "Request permissions")
+               if ((ContextCompat.checkSelfPermission(this@MainActivity,
+               android.Manifest.permission.RECORD_AUDIO) ===
+               PackageManager.PERMISSION_GRANTED)) {
+                  Log.i(tag, "OK")
+               }
+            } else {
+               Log.i(tag, "NO")
+            }
+    val permissions = Arguments.createMap()
+    permissions.putString("RECORD_AUDIO", "recordAudio")
+    permissions.putString("CALL_PHONE", "callPhone")
     callback(permissions)
   }
 
